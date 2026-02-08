@@ -1,0 +1,5 @@
+websec_cache.db
+
+*~
+venv
+__pycache__

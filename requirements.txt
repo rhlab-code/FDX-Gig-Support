@@ -1,0 +1,11 @@
+# Required dependencies for the project
+# To install, run: pip install -r requirements.txt
+
+macaddress
+numpy
+paramiko
+pandas
+scipy
+scp
+plotly
+python-dotenv
