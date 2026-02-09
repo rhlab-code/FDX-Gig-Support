@@ -303,7 +303,7 @@ def launch_gui():
 			try:
 				wbfft_path = os.path.join(os.path.dirname(__file__), 'wbfft.py')
 				# Build a single command string with quoted arguments
-				wbfft_cmd_str = f'"{sys.executable}" "{wbfft_path}" --image "{image}" --ip "{ip_to_use}" --path "{fn_name_string}"'
+				wbfft_cmd_str = f'"{sys.executable}" "{wbfft_path}" --image "{image}" --ip "{ip_to_use}" --channels "99M-1215M(6M)" --path "{fn_name_string}"'
 				append_output(f'Running: {wbfft_cmd_str}')
 				update_script_status('wbfft.py', 'Running...', ok=True)
 				wb = subprocess.run(wbfft_cmd_str, capture_output=True, text=True, env=env, timeout=180, shell=True)
