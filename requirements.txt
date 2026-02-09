@@ -9,3 +9,4 @@ scipy
 scp
 plotly
 python-dotenv
+requests
