@@ -2,3 +2,4 @@
 output/
 README_APP.md
 __pycache__/
+*.bak

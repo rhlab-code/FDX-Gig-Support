@@ -1,0 +1,63 @@
+{
+  "General settings": {
+    "constants_file": "constants.py",
+    "Prompt_before_apply_reset": false,
+    "Prompt_before_apply_north-afe-backoff": false,
+    "Prompt_before_apply_us-fdx-settings": false,
+    "firmware_version": "1.1.16",
+	  "upgradefw_timeout": 600,
+	  "alignment_timeout": 180,
+	  "other_timeout": 20
+  },
+  "RPD_settings": {
+	  "DS_BasePower": 482,
+    "DS_TiltMaximumFrequency": 1218000000,
+    "DS_TiltValue": 164,
+	  "US_RLSP": 8.0
+  },
+  "connection": {
+    "jumpbox_hostname": "jump.autobahn.comcast.com",
+    "jumpbox_username": "svcAutobahn",
+    "target_username": "admin",
+    "target_password": "AMPadmin"
+  },
+  "spectrum": {
+    "us-extended-end-freq": 396000000,
+    "subband_0_mode": "bidi",
+    "subband_1_mode": "bidi",
+    "subband_2_mode": "bidi",
+    "ds_override_enabled": false,
+    "ds-start-freq-cc": 384000000
+  },
+  "ds-profile": {
+    "start-freq": 109000000,
+    "end-freq": 1218000000,
+    "start-power": 31.8,
+    "end-power": 48.2
+  },
+  "us-profile": {
+    "rlsp": 8.0
+  },
+  "upgradefw": {
+	"host": "fec0:abcd:301::6",
+	"filename": "CS-FDXAMP-prod-r3-v1.1.16_2025-09-09.zip"
+  },
+  "alignment": {
+    "prompt_if_adjust_out-of-range": false,
+    "atten_adjust_threshold": 3,
+    "eq_adjust_threshold": 3
+  },
+  "clipping_test": {
+    "test_time": 10
+  },
+  "north-afe-backoff": {
+	"backoff": 3.0  
+  },
+  "atten-and-eq":{
+	"legacy-input-atten": "",
+	"ds-output-atten": "",
+	"ds-output-eq": "",
+	"us-fdx-atten": 31.5,
+	"us-fdx-eq": ""	  
+  }
+}

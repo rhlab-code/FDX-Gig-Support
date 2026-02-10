@@ -81,17 +81,17 @@ def launch_gui():
 	main = ttk.Frame(root, padding=(16, 12, 16, 12))
 	main.pack(fill='both', expand=True)
 
-	title = ttk.Label(main, text='AMP Info Launcher', font=header_font)
+	title = ttk.Label(main, text='AmpPoll', font=header_font)
 	title.grid(row=0, column=0, columnspan=3, sticky='w')
 
 	# Image selector
-	ttk.Label(main, text='Image:', font=normal_font).grid(row=1, column=0, sticky='e', pady=8)
+	ttk.Label(main, text='AMP Software:', font=normal_font).grid(row=1, column=0, sticky='e', pady=8)
 	image_var = tk.StringVar(value='CC')
 	image_combo = ttk.Combobox(main, textvariable=image_var, values=['CC', 'CS', 'SC', 'BC', 'CCs'], state='readonly', width=12)
 	image_combo.grid(row=1, column=1, sticky='w', padx=(8, 0))
 
 	# Address entry
-	ttk.Label(main, text='Addr (MAC or IPv6):', font=normal_font).grid(row=2, column=0, sticky='e')
+	ttk.Label(main, text='Address (MAC or IPv6):', font=normal_font).grid(row=2, column=0, sticky='e')
 	addr_var = tk.StringVar()
 	addr_entry = ttk.Entry(main, textvariable=addr_var, width=42, font=normal_font)
 	addr_entry.grid(row=2, column=1, columnspan=2, sticky='w', padx=(8, 0))
@@ -110,7 +110,8 @@ def launch_gui():
 	scripts_frame = ttk.Frame(main)
 	scripts_frame.grid(row=3, column=2, sticky='e', padx=(8,0))
 	# small labels for each script
-	script_names = ['amp_info.py', 'wbfft.py', 'ec.py']
+	# script_names = ['amp_info.py', 'wbfft.py', 'ec.py']
+	script_names = ['Amp Info', 'Data Graphs']
 	script_status_labels = {}
 	for i, name in enumerate(script_names):
 		lbl = ttk.Label(scripts_frame, text=f"{name}: Idle", font=('Segoe UI', 9))
@@ -269,7 +270,7 @@ def launch_gui():
 			ip_to_use = addr
 
 		# Build fnName string: fnName + '/' + cmMacAddr_or_submitted_mac + '/' + YYYYMMDD
-		date_str = datetime.now().strftime('%Y%m%d_%H%M')
+		date_str = datetime.now().strftime('%Y-%m-%d_%H-%M')
 		mac_for_fn = cm_mac_val
 		# if we don't have cm_mac_val and submitted addr looks like a MAC, use it
 		try:
@@ -293,48 +294,49 @@ def launch_gui():
 		fn_name_string = '/'.join(fn_components)
 		append_output(f'Constructed FN_NAME: {fn_name_string}')
 
-		# If we have an IP, call wbfft.py and ec.py with --image and --ip
+		# If we have an IP, call wbfft_v2.py with --mac and --ip
 		if ip_to_use:
-			set_status('Running wbfft.py and ec.py...', ok=True)
+			set_status('Working on it', ok=True)
 			env = os.environ.copy()
 			env['IMAGE'] = image
 
-			# wbfft.py
+			# wbfft_2.py
+			# python wbfft_v2.py 24:a1:86:1d:da:90 --ip 2001:558:6026:32:912b:2704:46eb:f4
 			try:
-				wbfft_path = os.path.join(os.path.dirname(__file__), 'wbfft.py')
+				wbfft_path = os.path.join(os.path.dirname(__file__), 'wbfft_v2.py')
 				# Build a single command string with quoted arguments
-				wbfft_cmd_str = f'"{sys.executable}" "{wbfft_path}" --image "{image}" --ip "{ip_to_use}" --channels "99M-1215M(6M)" --path "{fn_name_string}"'
+				wbfft_cmd_str = f'"{sys.executable}" "{wbfft_path}" --mac "{mac_for_fn}" --ip "{ip_to_use}" --output "{fn_name_string}"'
 				append_output(f'Running: {wbfft_cmd_str}')
-				update_script_status('wbfft.py', 'Running...', ok=True)
+				update_script_status('Data Graphs', 'Running...', ok=True)
 				wb = subprocess.run(wbfft_cmd_str, capture_output=True, text=True, env=env, timeout=180, shell=True)
 				if wb.returncode == 0:
 					append_output(wb.stdout.strip() or '(no output)')
-					update_script_status('wbfft.py', 'Completed', ok=True)
+					update_script_status('Data Graphs', 'Completed', ok=True)
 				else:
 					append_output(wb.stderr.strip() or wb.stdout.strip() or f'wbfft returned {wb.returncode}')
-					update_script_status('wbfft.py', 'Error', ok=False)
+					update_script_status('Data Graphs', 'Error', ok=False)
 			except Exception as e:
 				append_output(f'wbfft execution error: {e}')
-				update_script_status('wbfft.py', 'Error', ok=False)
+				update_script_status('Data Graphs', 'Error', ok=False)
 
 			# ec.py
-			try:
-				ec_path = os.path.join(os.path.dirname(__file__), 'ec.py')
-				ec_cmd_str = f'"{sys.executable}" "{ec_path}" --image "{image}" --ip "{ip_to_use}" --path "{fn_name_string}"'
-				append_output(f'Running: {ec_cmd_str}')
-				update_script_status('ec.py', 'Running...', ok=True)
-				ecproc = subprocess.run(ec_cmd_str, capture_output=True, text=True, env=env, timeout=300, shell=True)
-				if ecproc.returncode == 0:
-					append_output(ecproc.stdout.strip() or '(no output)')
-					update_script_status('ec.py', 'Completed', ok=True)
-				else:
-					append_output(ecproc.stderr.strip() or ecproc.stdout.strip() or f'ec returned {ecproc.returncode}')
-					update_script_status('ec.py', 'Error', ok=False)
-			except Exception as e:
-				append_output(f'ec execution error: {e}')
-				update_script_status('ec.py', 'Error', ok=False)
+			# try:
+			# 	ec_path = os.path.join(os.path.dirname(__file__), 'ec.py')
+			# 	ec_cmd_str = f'"{sys.executable}" "{ec_path}" --image "{image}" --ip "{ip_to_use}" --path "{fn_name_string}"'
+			# 	append_output(f'Running: {ec_cmd_str}')
+			# 	update_script_status('ec.py', 'Running...', ok=True)
+			# 	ecproc = subprocess.run(ec_cmd_str, capture_output=True, text=True, env=env, timeout=300, shell=True)
+			# 	if ecproc.returncode == 0:
+			# 		append_output(ecproc.stdout.strip() or '(no output)')
+			# 		update_script_status('ec.py', 'Completed', ok=True)
+			# 	else:
+			# 		append_output(ecproc.stderr.strip() or ecproc.stdout.strip() or f'ec returned {ecproc.returncode}')
+			# 		update_script_status('ec.py', 'Error', ok=False)
+			# except Exception as e:
+			# 	append_output(f'ec execution error: {e}')
+			# 	update_script_status('ec.py', 'Error', ok=False)
 
-			set_status('Completed wbfft/ec', ok=True)
+			set_status('Completed Tasks', ok=True)
 		else:
 			append_output('No valid IP determined; skipping wbfft/ec invocation')
 			set_status('No IP determined', ok=False)
