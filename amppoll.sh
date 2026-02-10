@@ -1,10 +1,16 @@
 #!/bin/bash
 echo "Starting AmpPoll. A tool for polling multiple measurement points in a FDX Amp."
 
-echo "Starting Jump UI..."
-jump -ui && \
-echo "Jump UI started successfully." || \
-echo "Failed to start Jump UI."
+echo "Starting Jump..."
+jump_output=$(jump -ui 2>&1)
+if [ -z "$jump_output" ]; then
+    echo "Failed to start Jump. No output received."
+    exit 1
+fi
+echo "Jump started successfully."
+echo "Pulling latest code from repository..."
+git pull && \
+echo "Updated code from repository."
 echo "Running app.py..."
 python app.py && \
 echo "app.py executed successfully." || \
