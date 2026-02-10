@@ -26,7 +26,7 @@ import re
 import threading
 
 
-parser = argparse.ArgumentParser(description="FDX-AMP WBFFT Analyzer for multiple measurement points.")
+parser = argparse.ArgumentParser(description="AmpPoll - amplifier polling for multiple measurement points.")
 parser.add_argument('--addr', type=str, help="Optional. Specify either IP or MAC address of the target device. Overrides the value in config.")
 args = parser.parse_args()
 
@@ -66,7 +66,7 @@ def launch_gui():
 	import tkinter.font as tkfont
 
 	root = tk.Tk()
-	root.title('AMP Info Launcher')
+	root.title('AmpPoll - Amplifier Polling Utility')
 	root.geometry('640x360')
 
 	# Style

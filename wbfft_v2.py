@@ -4,7 +4,7 @@
 # ssh -J svcAutobahn@jump.autobahn.comcast.com admin@2001:0558:6026:0032:912B:2704:46EB:00F4
 
 # Example usage:
-#   python wbfft_v2.py --env PROD --task showModuleInfo show_ds-profile show_us-profile show_spectrum show_north-afe-backoff show_rf_componenets get_wbfft get_ec show_fafe --settings amp_settings.json 24:a1:86:1d:da:90
+#   python wbfft_v2.py --env PROD --task showModuleInfo show_ds-profile show_us-profile show_spectrum get_sf get_eq show_rf_componenets get_wbfft get_ec show_fafe --settings amp_settings.json --mac '24:a1:86:1d:da:90' --ip 2001:558:6026:32:912b:2704:46eb:f4 --output 'test/get_eq'
 
 #   python wbfft_v2.py --env PROD --task get_wbfft get_ec show_fafe --settings amp_settings.json 24:a1:86:1d:da:90 --ip 2001:558:6026:32:912b:2704:46eb:f4
 
@@ -323,7 +323,7 @@ def main():
     args.type = 'CPE'
     args.env = 'PROD'
     args.settings = 'amp_settings.json'
-    args.task = ['get_wbfft', 'get_ec', 'show_fafe']
+    args.task = ['get_wbfft', 'get_ec', 'show_fafe', 'show_rf_componenets', 'show_spectrum', 'get_eq', 'get_sf', 'showModuleInfo', 'show_ds-profile', 'show_us-profile']
 
 
 
