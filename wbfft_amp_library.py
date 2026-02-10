@@ -125,7 +125,8 @@ class ComcastAmp(AmpControl):
                         raise TimeoutError(f"Timeout waiting for prompt '{prompt}' after command '{command}'")
                     
             elif "FDX-AMP>" in output:
-                channel.send('debug hal\n')
+                # channel.send('debug hal\n')
+                channel.send('debug hal\r\nlog_config --off\n')
             elif "FDX-AMP(" in output:
                 channel.send('exit\n')
             elif "login:" in output:
