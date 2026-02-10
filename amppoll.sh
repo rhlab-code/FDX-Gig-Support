@@ -11,6 +11,9 @@ echo "Jump started successfully."
 echo "Pulling latest code from repository..."
 git pull && \
 echo "Updated code from repository."
+echo "Installing any missing dependencies..."
+pip install -r requirements.txt && \
+echo "Dependencies installed."
 echo "Running app.py..."
 python app.py && \
 echo "app.py executed successfully." || \
