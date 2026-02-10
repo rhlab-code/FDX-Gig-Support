@@ -10,3 +10,4 @@ scp
 plotly
 python-dotenv
 requests
+ImageGrab
