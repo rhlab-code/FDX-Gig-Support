@@ -7,6 +7,23 @@ import numpy as np
 from datetime import datetime
 import logging
 
+import matplotlib.pyplot as plt
+import matplotlib.mlab as mlab
+import io
+import base64
+import matplotlib
+from matplotlib import font_manager
+import mpld3
+
+# Setup custom font for matplotlib (if needed)
+font_dirs = ["resources/fonts"]  # The path to the custom font file.
+font_files = font_manager.findSystemFonts(fontpaths=font_dirs)
+
+for font_file in font_files:
+    font_manager.fontManager.addfont(font_file)
+
+plt.rcParams['font.family'] = 'ComcastNewVision'  # Use the custom font for all plots
+
 def generate_eq_html_report(mac_address, us_coeffs, ds_coeffs, output_filename, freq_resolution_mhz):
     """Generates an interactive HTML plot using Plotly for the decoded coefficients."""
     fig = go.Figure()
@@ -119,7 +136,14 @@ def generate_ec_html_report(mac_address, decoded_data, output_dir):
     fig_coef.update_xaxes(title_text="Distance (ft)", row=1, col=1)
     fig_coef.update_xaxes(title_text="Frequency (MHz)", row=2, col=1)
     
-    coef_filename = os.path.join(output_dir, f"{sanitized_mac}_get_ec_coefs_data_{timestamp}.html")
+    # If caller passed a file path (ends with .html) use it directly for the coef report.
+    # Otherwise treat `output_dir` as a directory and construct the filename.
+    if str(output_dir).lower().endswith('.html'):
+        coef_filename = str(output_dir)
+        base_no_ext = coef_filename[:-5]
+        psd_filename = f"{base_no_ext}_psd.html"
+    else:
+        coef_filename = os.path.join(output_dir, f"{sanitized_mac}_get_ec_coefs_data_{timestamp}.html")
     pio.write_html(fig_coef, coef_filename)
     #open html
     abs_path = os.path.abspath(coef_filename)
@@ -138,7 +162,9 @@ def generate_ec_html_report(mac_address, decoded_data, output_dir):
                 full_y.extend(data.get('values', []))
             fig_psd.add_trace(go.Scatter(x=full_x, y=full_y, mode='lines', name=name))
     fig_psd.update_layout(title=f'EC PSD Metrics for {mac_address}', xaxis_title='Frequency (MHz)', yaxis_title='Power (dBmV/100kHz)', template='plotly_white', height=900)
-    psd_filename = os.path.join(output_dir, f"{sanitized_mac}_get_ec_psd_data_{timestamp}.html")
+    # If psd_filename wasn't set above (output_dir was directory), build it now.
+    if 'psd_filename' not in locals():
+        psd_filename = os.path.join(output_dir, f"{sanitized_mac}_get_ec_psd_data_{timestamp}.html")
     pio.write_html(fig_psd, psd_filename)
     #open html
     abs_path = os.path.abspath(psd_filename)
@@ -146,6 +172,142 @@ def generate_ec_html_report(mac_address, decoded_data, output_dir):
     url = f"file://{abs_path}"
     webbrowser.open_new_tab(url)    
     logging.info(f"[{mac_address}] Saved EC PSD Metrics HTML report to {psd_filename}")
+
+def generate_ec_html_report_matlab(mac_address, decoded_data, output_dir):
+    """Generates HTML reports for EC data using matplotlib (prefer mpld3 for interactivity).
+
+    If `mpld3` is installed the function writes fully interactive HTML (zoom, pan, tooltips).
+    Otherwise it falls back to embedding PNGs (base64) in HTML files.
+    Returns tuple: (coef_html_path, psd_html_path)
+    """
+    # Ensure non-interactive backend for file generation when needed
+    try:
+        matplotlib.use('Agg')
+    except Exception:
+        pass
+
+    sanitized_mac = mac_address.replace(':', '')
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+
+    # --- Coefficients figure ---
+    fig1, axes = plt.subplots(2, 1, figsize=(10, 8))
+
+    # Time Coef (IFFT)
+    if 2 in decoded_data:
+        for subBandId, data in decoded_data[2].items():
+            x = data.get('distance_ft', [])
+            y = data.get('values_db', [])
+            if x and y:
+                axes[0].plot(x, y, label=f"sb{subBandId}")
+    axes[0].set_title(f'Time Coef (IFFT) for {mac_address}')
+    axes[0].set_xlabel('Distance (ft)')
+    axes[0].set_ylabel('Amplitude (dB)')
+    axes[0].legend(loc='best')
+
+    # Freq Coef
+    if 1 in decoded_data:
+        full_freq_x, full_freq_y = [], []
+        for subBandId, data in decoded_data[1].items():
+            full_freq_x.extend(data.get('frequencies_mhz', []))
+            full_freq_y.extend(data.get('values', []))
+        if full_freq_x and full_freq_y:
+            axes[1].plot(full_freq_x, full_freq_y, '-k')
+    axes[1].set_title(f'Freq Coef for {mac_address}')
+    axes[1].set_xlabel('Frequency (MHz)')
+    axes[1].set_ylabel('Coefficient')
+
+    fig1.tight_layout()
+
+    coef_filename = os.path.join(output_dir, f"{sanitized_mac}_get_ec_coefs_data_{timestamp}.html")
+    try:
+        if mpld3 is not None:
+            # Use mpld3 to generate interactive HTML
+            coef_html = mpld3.fig_to_html(fig1)
+            with open(coef_filename, 'w', encoding='utf-8') as f:
+                f.write(coef_html)
+        else:
+            # Fallback: embed PNG as base64
+            buf1 = io.BytesIO()
+            fig1.savefig(buf1, format='png')
+            buf1.seek(0)
+            img1_b64 = base64.b64encode(buf1.read()).decode('ascii')
+            coef_html = f"""
+<html>
+<head><title>EC Coefficients - {sanitized_mac}</title></head>
+<body>
+<h2>Echo Cancellation Coefficients for {mac_address}</h2>
+<img src="data:image/png;base64,{img1_b64}" alt="EC Coefficients">
+</body>
+</html>
+"""
+            with open(coef_filename, 'w', encoding='utf-8') as f:
+                f.write(coef_html)
+        logging.info(f"[{mac_address}] Saved EC Coefficient HTML report to {coef_filename}")
+    except Exception as e:
+        logging.error(f"[{mac_address}] Failed to save EC Coefficient HTML report: {e}")
+    finally:
+        plt.close(fig1)
+
+    # --- PSD figure ---
+    fig2, ax2 = plt.subplots(1, 1, figsize=(10, 5))
+    psd_types = {5: "Echo PSD", 6: "Residual Echo PSD", 7: "Downstream PSD", 8: "Upstream PSD"}
+    any_plotted = False
+    for statsType, name in psd_types.items():
+        if statsType in decoded_data:
+            full_x, full_y = [], []
+            for subBandId, data in decoded_data[statsType].items():
+                full_x.extend(data.get('frequencies_mhz', []))
+                full_y.extend(data.get('values', []))
+            if full_x and full_y:
+                ax2.plot(full_x, full_y, label=name)
+                any_plotted = True
+    ax2.set_title(f'EC PSD Metrics for {mac_address}')
+    ax2.set_xlabel('Frequency (MHz)')
+    ax2.set_ylabel('Power (dBmV/100kHz)')
+    if any_plotted:
+        ax2.legend(loc='best')
+
+    fig2.tight_layout()
+
+    psd_filename = os.path.join(output_dir, f"{sanitized_mac}_get_ec_psd_data_{timestamp}.html")
+    try:
+        if mpld3 is not None:
+            psd_html = mpld3.fig_to_html(fig2)
+            with open(psd_filename, 'w', encoding='utf-8') as f:
+                f.write(psd_html)
+        else:
+            buf2 = io.BytesIO()
+            fig2.savefig(buf2, format='png')
+            buf2.seek(0)
+            img2_b64 = base64.b64encode(buf2.read()).decode('ascii')
+            psd_html = f"""
+<html>
+<head><title>EC PSD - {sanitized_mac}</title></head>
+<body>
+<h2>EC PSD Metrics for {mac_address}</h2>
+<img src="data:image/png;base64,{img2_b64}" alt="EC PSD">
+</body>
+</html>
+"""
+            with open(psd_filename, 'w', encoding='utf-8') as f:
+                f.write(psd_html)
+        logging.info(f"[{mac_address}] Saved EC PSD Metrics HTML report to {psd_filename}")
+    except Exception as e:
+        logging.error(f"[{mac_address}] Failed to save EC PSD HTML report: {e}")
+    finally:
+        plt.close(fig2)
+
+    # Open generated files
+    try:
+        webbrowser.open_new_tab(f"file://{os.path.abspath(coef_filename)}")
+    except Exception:
+        pass
+    try:
+        webbrowser.open_new_tab(f"file://{os.path.abspath(psd_filename)}")
+    except Exception:
+        pass
+
+    return coef_filename, psd_filename
 
 def generate_us_psd_report(mac_address, us_psd_data, target_psd, output_dir, eq_adjust=None, atten_adjust=None, child_mac_address=None):
     """Generates an interactive HTML plot for the US PSD, Target PSD, and Delta."""

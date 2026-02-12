@@ -1,0 +1,709 @@
+COMMAND:  !
+
+USAGE:  !  [Number{0..15}] [command{31}]
+
+DESCRIPTION:
+Executes the last command that was entered.  If a command (or history number)
+is specified, then it executes that command from the history buffer.  This
+works like the Unix '!' command
+
+EXAMPLES:
+!     -- This repeats the last command that was entered.
+! cd  -- This repeats the last 'cd' command that was entered.
+
+-----------------------------------------------------------------------------
+
+COMMAND:  ?
+
+USAGE:  ?  [-t|-l|-s|-i|-a|-lr] [command [...]{126}]
+
+DESCRIPTION:
+Alias for 'help'.  Type 'help help' for more information.
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  REM
+
+USAGE:  REM  [Remark text{126}]
+
+DESCRIPTION:
+Ignores the text that follows; used for remarks, scripting, etc.
+
+EXAMPLES:
+REM Started test here.  --
+
+-----------------------------------------------------------------------------
+
+COMMAND:  cd
+
+USAGE:  cd  [subtable | .. | \ | /{31}]
+
+DESCRIPTION:
+Sets the specified command table as the active table.  This works like the
+DOS or Unix 'cd' command where '..' takes you to the previous table, and '\'
+or '/' takes you to the root table.  If no parameters are specified, then it
+shows the name of the currently active command table.
+
+EXAMPLES:
+cd classifiers  -- Makes the specified subtable the active command table.
+cd \            -- Makes the main command table active.
+cd ..           -- Makes the previous (parent) command table active.
+cd              -- Shows the name of the active command table.
+cd \non\doc     -- You can specify partial names, and multiple subdirs.
+
+-----------------------------------------------------------------------------
+
+COMMAND:  dir
+
+USAGE:  dir  [-t|-l|-s|-i|-a|-lr] [command [...]{126}]
+
+DESCRIPTION:
+Alias for 'help'.  Type 'help help' for more information.
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  find_command
+
+USAGE:  find_command  command{31}
+
+DESCRIPTION:
+Displays the name of all subdirectories which contain the specified command.
+
+EXAMPLES:
+find_command show  --
+
+-----------------------------------------------------------------------------
+
+COMMAND:  help
+
+USAGE:  help  [-t|-l|-s|-i|-a|-lr] [command [...]{126}]
+
+DESCRIPTION:
+Shows usage information about the specified command(s), or lists the set of
+commands available in the active table.  If no parameters are specified, then
+an abbreviated list of all commands and subtables is displayed.
+
+     -u  -- Shows general information about command formatting and parsing.
+     -t  -- Shows the entire tree of command tables and commands (in
+            abbreviated form).
+     -l  -- Shows detailed information about all commands and subtables (this
+            can print a LOT of information)!
+     -s  -- Shows detailed information on just the subtables.
+     -i  -- Shows detailed information on just the registered instances for
+            the active table.
+     -a  -- Does everything that the -l, -s, and -i options do.
+
+Command is the name (or partial name) of one or more commands and subtables
+for which you want detailed help to be displayed.
+
+EXAMPLES:
+help            -- This shows an abbreviated list of all commands and
+                   subtables.
+help cd         -- This shows detailed help on the 'cd' command.
+help cd ! diag  -- This shows detailed help on the 2 commands and subtable
+                   listed.
+help -l         -- Shows detailed help on all available commands and
+                   subtables.
+help -u         -- Shows how the parser expects commands to be formatted.
+
+-----------------------------------------------------------------------------
+
+COMMAND:  history
+
+USAGE:  history
+
+DESCRIPTION:
+Shows a list of commands that were previously typed.
+
+EXAMPLES:
+history  --
+
+-----------------------------------------------------------------------------
+
+COMMAND:  instances
+
+USAGE:  instances  [name{31}]
+
+DESCRIPTION:
+Shows the set of object instances that have registered with the active table.
+This is the same as 'help -i', except that it lets you specify a partial
+instance name in order to limit the list that is displayed (only instances
+whose names match the partial string are shown).  The name is not case
+sensitive.
+
+EXAMPLES:
+instances    -- Shows all instances registered with the command table.
+instances p  -- Shows all instances whose name begins with 'p' or 'P'.
+
+-----------------------------------------------------------------------------
+
+COMMAND:  ls
+
+USAGE:  ls  [-t|-l|-s|-i|-a|-lr] [command [...]{126}]
+
+DESCRIPTION:
+Alias for 'help'.  Type 'help help' for more information.
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  man
+
+USAGE:  man  [-t|-l|-s|-i|-a|-lr] [command [...]{126}]
+
+DESCRIPTION:
+Alias for 'help'.  Type 'help help' for more information.
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  pwd
+
+USAGE:  pwd
+
+DESCRIPTION:
+Shows the name of the currently active command table.  This is like the Unix
+'pwd' command.
+
+EXAMPLES:
+pwd  --
+
+-----------------------------------------------------------------------------
+
+COMMAND:  sleep
+
+USAGE:  sleep  Milliseconds
+
+DESCRIPTION:
+Causes the console to sleep for the specified number of milliseconds.  This
+is useful for scripting, where you want to delay between commands.
+
+EXAMPLES:
+sleep 1000  -- Makes the console sleep for 1 second
+
+-----------------------------------------------------------------------------
+
+COMMAND:  syntax
+
+USAGE:  syntax
+
+DESCRIPTION:
+Displays detailed information on command line syntax and how the parser
+works.
+
+EXAMPLES:
+syntax  --
+
+-----------------------------------------------------------------------------
+
+COMMAND:  system_time
+
+USAGE:  system_time
+
+DESCRIPTION:
+Displays the current system millisecond tick counter.
+
+EXAMPLES:
+system_time  --
+
+-----------------------------------------------------------------------------
+
+COMMAND:  usage
+
+USAGE:  usage
+
+DESCRIPTION:
+Displays information about how the console works, and how to use it.
+
+EXAMPLES:
+usage  --
+
+-----------------------------------------------------------------------------
+
+COMMAND:  agc_maintenance
+
+USAGE:  agc_maintenance
+
+DESCRIPTION:
+agc_maintenance [command] [<options...>]
+
+Available commands and options:
+    enable - enable AGC maintenance
+    disable - disable AGC maintenance
+    forcegearshift - force a gear shift to be performed
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  atm
+
+USAGE:  atm
+
+DESCRIPTION:
+atm
+
+ATM modes.
+
+Options:
+    scap on [<captureCount>] [<captureDelay>] - Enable SCAP encapsulation
+        <captureCount> - # of SCAP captures to perform (default=0=indefinite)
+        <captureDelay> - msec delay between SCAP captures (default=100ms)
+    scap off - Disable SCAP encapsulation
+    adc cnt [<captureSize>] - Single ADC counter test
+    adc lfsr [<captureSize>] - Single ADC LFSR test
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  cal_table_lookup
+
+USAGE:  cal_table_lookup
+
+DESCRIPTION:
+cal_table_lookup [value] [mode] [input]
+
+Available commands and options:
+    value - value to lookup
+    input - 0=Rx[default]
+            1=Nc
+    mode  - 0=Gain to Gain Code[default]
+            1=Gain Code to Gain
+startFreq - Starting Frequency in Hz[default=108Mhz]
+  endFreq - Ending Frequency in Hz[default=684Mhz]
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  capabilities
+
+USAGE:  capabilities
+
+DESCRIPTION:
+capabilities
+
+Dump board capabilities
+Options: none
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  clear_profile
+
+USAGE:  clear_profile
+
+DESCRIPTION:
+clear_profile .................. dump and clear profile stats
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  docsis_time
+
+USAGE:  docsis_time
+
+DESCRIPTION:
+docsis_time - get current DOCSIS timestamp, if available
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  downstream_psd_descriptor
+
+USAGE:  downstream_psd_descriptor
+
+DESCRIPTION:
+downstream_psd_descriptor [verbose]
+
+Dump the downstream PSD descriptor
+Options: none
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  dump_profile
+
+USAGE:  dump_profile
+
+DESCRIPTION:
+dump_profile [on|off]
+
+Dump execution profile stats.
+
+Options:
+    on    - Enable the code timer
+    off   - Disable the code timer
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  dump_south_port
+
+USAGE:  dump_south_port
+
+DESCRIPTION:
+dump_south_port
+
+Dump south port debug data
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  ec_conv_state
+
+USAGE:  ec_conv_state
+
+DESCRIPTION:
+ec_conv_state [chan_index] [state]
+
+Available commands and options:
+  chan_index - channel index
+  state      - 1=converged 0=non converged
+Dump the echo canceller convergence state per subband.
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  ec_pnm_stats
+
+USAGE:  ec_pnm_stats
+
+DESCRIPTION:
+ec_pnm_stats [statsType] [subBandId] [filename] - Collect EC stats
+    statsType - EC PNM statistics type:
+         1 - EC Coefficient in freq. domain
+         2 - EC Coefficient in time domain
+         3 - EC Cancellation Depth
+         5 - Echo PSD
+         6 - Residual Echo PSD
+         7 - Downstream PSD
+         8 - Upstream PSD
+    subBandId - sub-band id (0=default)
+    filename  - path and filename to write to
+                /tmp/ec_pnm_stats_output_sbX_typeY.dat (default)
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  event_log
+
+USAGE:  event_log
+
+DESCRIPTION:
+event_log [ [offset [count]] | on | on_all | off ]
+         Dump <count> events (default=100) in reverse starting at <offset>
+         events from the last logged event, or turn event logging on or off.
+         A dump will turn logging off. Re-enable it via 'event_log on',
+         which will log all codeTimer_LOG calls. The 'on_all' parameter
+         will log all CodeTimer_START, CodeTimer_COUNT, or CodeTimer_LOG
+         calls. (See Common/CodeTimer.h).
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  log_config
+
+USAGE:  log_config
+
+DESCRIPTION:
+Use log_config --help for usage.
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  log_zone
+
+USAGE:  log_zone
+
+DESCRIPTION:
+Debug log zones
+usage: log_zone [zone] [on/off/level]
+Parameters:
+  zone   Zone name (i.e. Z_Debug3)
+  level  debug,info,notice,warn,error,crit,alert,emerg
+Examples:
+  log_zone Z_Debug3 debug - Set Debug3 zone to debug log level
+  log_zone Z_Debug3 on    - Set Debug3 zone to debug log level (on/all logs
+enabled)
+  log_zone Z_Debug3 off   - Set Debug3 zone to emerg log level (off/logs
+disabled)
+  log_zone Z_Common emerg - Set Common zone to emerg log level (off/logs
+disabled)
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  power
+
+USAGE:  power
+
+DESCRIPTION:
+power <block> [<mode>]
+
+Query, power up, power down, or soft reset a HW block.
+Block IDs are as follows:
+     0 = PowerUsRptrBlock
+     1 = PowerAifBlock
+     2 = PowerDpdBlock
+     3 = PowerDsTopBlock
+     4 = PowerUsTopBlock
+     5 = PowerWbfftBlock
+     6 = PowerGchBlock
+     7 = PowerN2sBlock
+     8 = PowerLeap0Block
+     9 = PowerAtmBlock
+
+Options:
+    <block> - Block number
+    <mode>  - 0 = power down, 1 = power up, 2 = soft reset
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  quit
+
+USAGE:  quit
+
+DESCRIPTION:
+quit [force]........................... shutdown
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  reinit_usrptr
+
+USAGE:  reinit_usrptr
+
+DESCRIPTION:
+reinit_usrptr
+
+Re-initialize the USRPTR block
+Options: none
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  s2p_parse
+
+USAGE:  s2p_parse
+
+DESCRIPTION:
+s2p_parse <filename> <startFreqHz> <endFreqHz> [column#]
+
+Attempt to parse specified S2P file
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  shell
+
+USAGE:  shell
+
+DESCRIPTION:
+shell <cmd> .................... run a Linux shell command
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  spectrum_allocation
+
+USAGE:  spectrum_allocation
+
+DESCRIPTION:
+spectrum_allocation
+
+Dump the spectrum allocation
+Options: none
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  temp_calib
+
+USAGE:  temp_calib
+
+DESCRIPTION:
+temp_calib
+
+Options:
+    on [<repeat>] [<period>] - Enables the periodic temperature calibration
+        <repeat> - number of temperature calibrations requested, zero for
+unlimited
+        <period> - delay period between temperature calibrations in seconds,
+minimum - 60 seconds
+    off - Disables the periodic temperature calibration
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  threads
+
+USAGE:  threads
+
+DESCRIPTION:
+threads [tid priority]
+  Display the list of Head End threads, optionally setting the priority of
+  the specified thread.
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  ubus
+
+USAGE:  ubus
+
+DESCRIPTION:
+ubus <command> <address> <options...>
+
+Read or write over the UBUS
+
+Options per <command>:
+    write <startAddress> <word1> [<word2> <word3> ...]
+    fill <startAddress> <word> [<numWrites (default=1)>]
+    read <startAddress> [<numWords (default=1)>] [<filename>]
+       <filename> can specify a file to save the dump to
+    writebits <address> <mask> <bits> [<bitshift (default=0)>]
+       <bitshift> optionally left-bitshifts <mask> and <bits>
+
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+COMMAND:  version
+
+USAGE:  version
+
+DESCRIPTION:
+version ......................... display version
+
+EXAMPLES:
+No examples available...
+
+-----------------------------------------------------------------------------
+
+Command Table:  Calibration (calibration)
+
+Description:
+
+Calibration Commands
+
+-----------------------------------------------------------------------------
+
+Command Table:  GCH (gch)
+
+Description:
+
+GCH debug commands
+
+-----------------------------------------------------------------------------
+
+Command Table:  leap (leap)
+
+Description:
+
+Debug commands for the LEAP
+
+-----------------------------------------------------------------------------
+
+Command Table:  N2S (n2s)
+
+Description:
+
+N2S debug commands
+
+-----------------------------------------------------------------------------
+
+Command Table:  Registry Directory (registry)
+
+Description:
+
+The registry command directory
+
+-----------------------------------------------------------------------------
+
+Command Table:  usrptr (usrptr)
+
+Description:
+
+Debug commands for the USRPTR
+
+-----------------------------------------------------------------------------
+
+Command Table:  WBFFT (wbfft)
+
+Description:
+
+WBFFT debug commands
+
+-----------------------------------------------------------------------------

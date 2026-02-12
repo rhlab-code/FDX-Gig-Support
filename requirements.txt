@@ -12,3 +12,7 @@ python-dotenv
 requests
 ImageGrab
 Pillow
+#office365-rest-python-client
+matplotlib
+mpld3
+ttkbootstrap

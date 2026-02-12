@@ -15,7 +15,7 @@ from utils import clean_raw_output, should_proceed, HardStopException
 import parsers
 import verifiers
 from reporting import (generate_eq_html_report, generate_ec_html_report, 
-                       generate_us_psd_report, generate_wbfft_report, generate_sf_html_report)
+                       generate_us_psd_report, generate_ec_html_report_matlab, generate_wbfft_report, generate_sf_html_report)
 from analysis import (
     decode_line_equalizer_coefficients, decode_peq_coefficients, 
     complex_to_mag_db, analyze_psd_delta, process_wbfft_data, calculate_channel_power,
@@ -116,7 +116,7 @@ def update_profile_settings_file(mac_address, parsed_data, task_name, output_dir
         logging.error(f"[{mac_address}] Failed to write to profile_settings.json: {e}")
 
 
-def connect_and_run_tasks(mac_address, target_hostname, task_names, command_sequences, settings, constants,
+def connect_and_run_tasks(mac_address, target_hostname, task_names, command_sequences, amp_image, settings, constants,
                           parent_mac=None, parent_ip=None, context=None,
                           device_index=0, total_devices=0, output_dir="output", file_lock=None):
     """Connects to a host and executes a list of predefined tasks sequentially."""
@@ -129,8 +129,10 @@ def connect_and_run_tasks(mac_address, target_hostname, task_names, command_sequ
     
     general_settings = settings.get("General settings", {})
     other_timeout = general_settings.get("other_timeout", 40)
-    
-    connection_settings = settings.get("connection", {})
+    if amp_image == 'CC':
+        connection_settings = settings.get("connection", {})
+    elif amp_image == 'CS':
+        connection_settings = settings.get("cs_connection", {})
     jumpbox_client, target_client, shell, scp_client = None, None, None, None
 
     def _check_for_hard_stop(task_name, task_result_summary):
@@ -644,7 +646,8 @@ def connect_and_run_tasks(mac_address, target_hostname, task_names, command_sequ
                             
                             all_decoded_data[2][subBandId] = {'distance_ft': distance_ft_shifted, 'values_db': values_td.tolist()}
                             
-                    generate_ec_html_report(mac_address, all_decoded_data, output_dir)
+                    # generate_ec_html_report(mac_address, all_decoded_data, output_dir)
+                    generate_ec_html_report_matlab(mac_address, all_decoded_data, output_dir)
                     sanitized_mac = mac_address.replace(':', '')
                     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                     json_filename = os.path.join(output_dir, f"{sanitized_mac}_get_ec_data_{timestamp}.json")
@@ -725,7 +728,8 @@ def connect_and_run_tasks(mac_address, target_hostname, task_names, command_sequ
                     if all_values:
                         avg_input_power = sum(all_values) / len(all_values)
                         logging.info(f"[{mac_address}] Average input power: {avg_input_power:.1f} dBmV")
-                        if avg_input_power < -30:
+                        # if avg_input_power < -30:
+                        if avg_input_power < -70:   #RH
                             logging.error(f"[{mac_address}] Average input power {avg_input_power:.1f} dBmV is below threshold (-30 dBmV). Ending task and script.")
                             task_result_summary['details'] = f"Average input power {avg_input_power:.1f} dBmV is below threshold (-30 dBmV)."
                             task_result_summary['task_status'] = "Failed"
@@ -743,8 +747,8 @@ def connect_and_run_tasks(mac_address, target_hostname, task_names, command_sequ
                     else:
                         logging.warning(f"[{mac_address}] Could not generate EQ/Attenuation suggestions.")
                     child_mac_for_report = context.get('child_mac') if context else None
-                    html_filename = generate_us_psd_report(mac_address, us_psd_data, target_psd_100khz, output_dir, eq_adjust, atten_adjust, child_mac_address=child_mac_for_report)
-                    
+                    # html_filename = generate_us_psd_report(mac_address, us_psd_data, target_psd_100khz, output_dir, eq_adjust, atten_adjust, child_mac_address=child_mac_for_report)
+                    html_filename = generate_us_psd_report_matlab(mac_address, us_psd_data, target_psd_100khz, output_dir, eq_adjust, atten_adjust, child_mac_address=child_mac_for_report)
                     # --- NEW: Save results to JSON ---
                     sanitized_mac = mac_address.replace(':', '')
                     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')

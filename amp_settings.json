@@ -21,6 +21,12 @@
     "target_username": "admin",
     "target_password": "AMPadmin"
   },
+  "cs_connection": {
+    "jumpbox_hostname": "jump.autobahn.comcast.com",
+    "jumpbox_username": "svcAutobahn",
+    "target_username": "cli",
+    "target_password": "cli"
+  },
   "spectrum": {
     "us-extended-end-freq": 396000000,
     "subband_0_mode": "bidi",

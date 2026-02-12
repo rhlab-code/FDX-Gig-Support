@@ -3,3 +3,7 @@ output/
 README_APP.md
 __pycache__/
 *.bak
+fdx-gnmic.txt
+hal-commands.txt
+resources/icons/main_icon.png
+resources/icons/sq_icon.png

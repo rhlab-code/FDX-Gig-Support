@@ -73,7 +73,7 @@ def update_mac_ip_mapping_file(filepath, mac, ip):
     with open(filepath, 'w') as f:
         json.dump(mapping, f, indent=2)
 
-def run_schedule_worker(schedule_data, args, settings, constants, command_sequences, status_queue):
+def run_schedule_worker(schedule_data, args, amp_image, settings, constants, command_sequences, status_queue):
     """
     This function runs in a separate thread and executes the main script logic.
     It sends status updates back to the GUI via the status_queue.
@@ -158,7 +158,7 @@ def run_schedule_worker(schedule_data, args, settings, constants, command_sequen
                 def _parallel_task_runner(mac, ip, tasks, device_idx, total_devs):
                     logging.info(f"Starting parallel thread for {mac} ({ip})")
                     _, result_data = connect_and_run_tasks(
-                        mac, ip, tasks, command_sequences, settings, constants,
+                        mac, ip, tasks, command_sequences, amp_image, settings, constants,
                         parent_mac=parent_mac_from_schedule, parent_ip=parent_ip,
                         device_index=device_idx, total_devices=total_devs,
                         output_dir=args.output,
@@ -199,7 +199,7 @@ def run_schedule_worker(schedule_data, args, settings, constants, command_sequen
                         status_queue.put((i, mac, "Running"))
                         device_index = j + 1
                         _, result_data = connect_and_run_tasks(
-                            mac, ip, runnable_tasks, command_sequences, settings, constants,
+                            mac, ip, runnable_tasks, command_sequences, amp_image, settings, constants,
                             parent_mac=parent_mac_from_schedule, parent_ip=parent_ip,
                             device_index=device_index, total_devices=len(mac_ip_mapping),
                             output_dir=args.output
@@ -316,6 +316,7 @@ def main():
     parser.add_argument('--start-index', type=int, help="The starting index for tasks in a schedule file.")
     parser.add_argument('--end-index', type=int, help="The ending index for tasks in a schedule file.")
     parser.add_argument('--output', type=str, default='output', help="Path to the output folder.")
+    parser.add_argument('--image', type=str, default='CC', help="Amp software type (e.g., 'CS' for CommScope, 'CC' for Comcast). This determines which config to load.")
     args = parser.parse_args()
 
     # RH
@@ -323,8 +324,9 @@ def main():
     args.type = 'CPE'
     args.env = 'PROD'
     args.settings = 'amp_settings.json'
-    args.task = ['get_wbfft', 'get_ec', 'show_fafe', 'show_rf_componenets', 'show_spectrum', 'get_eq', 'get_sf', 'showModuleInfo', 'show_ds-profile', 'show_us-profile']
-
+    # args.task = ['get_wbfft', 'get_ec', 'show_fafe', 'get_clipping', 'show_rf_componenets', 'show_spectrum', 'get_eq', 'get_sf', 'showModuleInfo', 'show_ds-profile', 'show_us-profile', 'get_us_psd']
+    # args.task = ['get_ec']
+    amp_image = args.image
 
 
     output_dir = "output/" + args.output
@@ -392,7 +394,7 @@ def main():
         # Create and start the worker thread
         worker_thread = threading.Thread(
             target=run_schedule_worker,
-            args=(schedule_data, args, settings, constants, command_sequences, status_queue),
+            args=(schedule_data, args, amp_image, settings, constants, command_sequences, status_queue),
             daemon=True # Ensures thread exits when main program exits
         )
         worker_thread.start()
@@ -424,7 +426,7 @@ def main():
         try:
             for i, (mac, ip) in enumerate(mac_ip_mapping.items()):
                 _mac, result_data = connect_and_run_tasks(
-                    mac, ip, args.task, command_sequences, settings, constants,
+                    mac, ip, args.task, command_sequences, amp_image, settings, constants,
                     # parent_mac=parent_mac, parent_ip=parent_ip,
                     device_index=i + 1, total_devices=len(mac_ip_mapping),
                     output_dir=output_dir
