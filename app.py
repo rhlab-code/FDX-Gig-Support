@@ -402,8 +402,8 @@ def launch_gui():
 
 	submit_btn = tb.Button(btn_frame, text='Submit', command=on_submit, bootstyle='success')
 	submit_btn.grid(row=0, column=0, padx=6)
-	copy_btn = tb.Button(btn_frame, text='Copy Output', command=copy_output, bootstyle='info')
-	copy_btn.grid(row=0, column=1, padx=6)
+	# copy_btn = tb.Button(btn_frame, text='Copy DEBUG Info', command=copy_output, bootstyle='info')
+	# copy_btn.grid(row=0, column=1, padx=6)
 	clear_btn = tb.Button(btn_frame, text='Clear', command=clear_output, bootstyle='warning')
 	clear_btn.grid(row=0, column=2, padx=6)
 
