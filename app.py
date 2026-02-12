@@ -202,6 +202,19 @@ def launch_gui():
 	def clear_output():
 		pass
 
+	def clear_all():
+		"""Uncheck all tasks and clear the address input field."""
+		for var in task_vars.values():
+			var.set(False)
+		addr_var.set('')
+		clear_output()
+		set_status('Cleared', ok=True)
+
+	def select_all_tasks():
+		"""Select all tasks."""
+		for var in task_vars.values():
+			var.set(True)
+
 	def copy_output():
 		set_status('Output copied to clipboard', ok=True)
 
@@ -404,7 +417,9 @@ def launch_gui():
 	submit_btn.grid(row=0, column=0, padx=6)
 	# copy_btn = tb.Button(btn_frame, text='Copy DEBUG Info', command=copy_output, bootstyle='info')
 	# copy_btn.grid(row=0, column=1, padx=6)
-	clear_btn = tb.Button(btn_frame, text='Clear', command=clear_output, bootstyle='warning')
+	select_all_btn = tb.Button(btn_frame, text='Select All', command=select_all_tasks, bootstyle='info')
+	select_all_btn.grid(row=0, column=1, padx=6)
+	clear_btn = tb.Button(btn_frame, text='Reset', command=clear_all, bootstyle='warning')
 	clear_btn.grid(row=0, column=2, padx=6)
 
 	# make the output region expand
