@@ -646,8 +646,8 @@ def connect_and_run_tasks(mac_address, target_hostname, task_names, command_sequ
                             
                             all_decoded_data[2][subBandId] = {'distance_ft': distance_ft_shifted, 'values_db': values_td.tolist()}
                             
-                    # generate_ec_html_report(mac_address, all_decoded_data, output_dir)
-                    generate_ec_html_report_matlab(mac_address, all_decoded_data, output_dir)
+                    generate_ec_html_report(mac_address, all_decoded_data, output_dir)
+                    # generate_ec_html_report_matlab(mac_address, all_decoded_data, output_dir)
                     sanitized_mac = mac_address.replace(':', '')
                     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                     json_filename = os.path.join(output_dir, f"{sanitized_mac}_get_ec_data_{timestamp}.json")
