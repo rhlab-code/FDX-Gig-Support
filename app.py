@@ -115,8 +115,8 @@ def launch_gui():
 
 	# Task selector (checkboxes)
 	available_tasks = [
-		'showModuleInfo', 'show_spectrum', 'show_ds-profile', 'show_us-profile', 
-		'show_rf_components', 'show_fafe',
+		# 'showModuleInfo', 'show_spectrum', 'show_ds-profile', 'show_us-profile', 
+		# 'show_rf_components', 'show_fafe',
 		'get_wbfft', 'get_eq', 'get_sf', 'get_ec', 'get_us_psd',
 		'get_wbfft_hal_gains',
 		'reset'
@@ -188,13 +188,18 @@ def launch_gui():
 		status_var.set(text)
 		status_label.configure(foreground='#0B8457' if ok else '#C62828')
 
-	def update_script_status(script, text, ok=True):
-		"""Update the small script status label with color."""
-		lbl = script_status_labels.get(script)
-		if not lbl:
-			return
-		lbl.configure(text=f"{script}: {text}")
-		lbl.configure(foreground='#0B8457' if ok else '#C62828')
+	# def update_task_status(task_name, status, ok=True):
+	# 	"""Update the status label for a specific task.
+	# 	Status can be 'Running', 'Completed', or 'Failed'.
+	# 	"""
+	# 	if task_name in task_status_labels:
+	# 		if status == 'Running':
+	# 			task_status_labels[task_name].configure(text=f"{make_label(task_name)}: ● Running", foreground='#F57C00')
+	# 		elif status == 'Completed':
+	# 			task_status_labels[task_name].configure(text=f"{make_label(task_name)}: ✓ Completed", foreground='#0B8457')
+	# 		elif status == 'Failed':
+	# 			task_status_labels[task_name].configure(text=f"{make_label(task_name)}: ✗ Failed", foreground='#C62828')
+	# 	root.update_idletasks()
 
 	def append_output(text):
 		pass
@@ -215,8 +220,6 @@ def launch_gui():
 		for var in task_vars.values():
 			var.set(True)
 
-	def copy_output():
-		set_status('Output copied to clipboard', ok=True)
 
 	# Spinner animation setup
 	spinner_frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
@@ -235,19 +238,16 @@ def launch_gui():
 	def run_amp_info(image, addr):
 		cmd = [sys.executable, os.path.join(os.path.dirname(__file__), 'amp_info.py'), 'PROD', 'CPE', addr]
 		env = os.environ.copy()
-		set_status('Running Amp Info...', ok=True)
-		update_script_status('Amp Info', 'Running...', ok=True)
-		append_output(f'Running: {" ".join(cmd)}')
+		# set_status('Running Amp Info...', ok=True)
+		# append_output(f'Running: {" ".join(cmd)}')
 		try:
 			proc = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=60)
 			raw_out = proc.stdout.strip() if proc.stdout else ''
-			raw_err = proc.stderr.strip() if proc.stderr else ''
+			# raw_err = proc.stderr.strip() if proc.stderr else ''
 			if proc.returncode != 0:
-				append_output(raw_err or raw_out or f'return code {proc.returncode}')
-				set_status('Error running Amp Info', ok=False)
-				update_script_status('Amp Info', 'Error', ok=False)
+				# append_output(raw_err or raw_out or f'return code {proc.returncode}')
+				# set_status('Error running Amp Info', ok=False)
 				return None, raw_out
-
 			# try to parse output as JSON first, then as Python literal
 			parsed = None
 			if raw_out:
@@ -259,18 +259,17 @@ def launch_gui():
 					except Exception:
 						parsed = None
 
-			append_output(raw_out or '(no output)')
-			set_status('Amp Info completed', ok=True)
-			update_script_status('Amp Info', 'Completed', ok=True)
+			# append_output(raw_out or '(no output)')
+			# set_status('Amp Info completed', ok=True)
 			return parsed, raw_out
 
 		except subprocess.TimeoutExpired:
-			append_output('Amp Info timed out')
-			set_status('Timeout', ok=False)
+			# append_output('Amp Info timed out')
+			# set_status('Timeout', ok=False)
 			return None, ''
 		except Exception as e:
-			append_output(f'Execution error: {e}')
-			set_status('Execution error', ok=False)
+			# append_output(f'Execution error: {e}')
+			# set_status('Execution error', ok=False)
 			return None, ''
 
 	def on_submit(event=None):
@@ -378,17 +377,17 @@ def launch_gui():
 				# Build a single command string with quoted arguments
 				wbfft_cmd_str = f'"{sys.executable}" "{wbfft_path}" --mac "{mac_for_fn}" --ip "{ip_to_use}" --image "{image}" --output "{fn_name_string}" --task {task_arg}'
 				append_output(f'Running: {wbfft_cmd_str}')
-				update_script_status('Data Graphs', 'Running...', ok=True)
+				
 				wb = subprocess.run(wbfft_cmd_str, capture_output=True, text=True, env=env, timeout=180, shell=True)
 				if wb.returncode == 0:
 					append_output(wb.stdout.strip() or '(no output)')
-					update_script_status('Data Graphs', 'Completed', ok=True)
+				
 				else:
 					append_output(wb.stderr.strip() or wb.stdout.strip() or f'wbfft returned {wb.returncode}')
-					update_script_status('Data Graphs', 'Error', ok=False)
+			
 			except Exception as e:
 				append_output(f'wbfft execution error: {e}')
-				update_script_status('Data Graphs', 'Error', ok=False)
+			
 
 			# ec.py
 			# try:

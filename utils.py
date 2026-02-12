@@ -107,3 +107,42 @@ def save_gui_as_png(root, output_dir):
         
     except Exception as e:
         logging.error(f"Failed to save GUI screenshot: {e}")
+
+# Adding  newer function to retreive amp information
+# returns json array with MAC, IPv6, and node name regardless of which address is submitted
+def run_amp_info(image, addr):
+    cmd = [sys.executable, os.path.join(os.path.dirname(__file__), 'amp_info.py'), 'PROD', 'CPE', addr]
+    env = os.environ.copy()
+    # set_status('Running Amp Info...', ok=True)
+    # append_output(f'Running: {" ".join(cmd)}')
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=60)
+        raw_out = proc.stdout.strip() if proc.stdout else ''
+        # raw_err = proc.stderr.strip() if proc.stderr else ''
+        if proc.returncode != 0:
+            # append_output(raw_err or raw_out or f'return code {proc.returncode}')
+            # set_status('Error running Amp Info', ok=False)
+            return None, raw_out
+        # try to parse output as JSON first, then as Python literal
+        parsed = None
+        if raw_out:
+            try:
+                parsed = json.loads(raw_out)
+            except Exception:
+                try:
+                    parsed = ast.literal_eval(raw_out)
+                except Exception:
+                    parsed = None
+
+        # append_output(raw_out or '(no output)')
+        # set_status('Amp Info completed', ok=True)
+        return parsed, raw_out
+
+    except subprocess.TimeoutExpired:
+        # append_output('Amp Info timed out')
+        # set_status('Timeout', ok=False)
+        return None, ''
+    except Exception as e:
+        # append_output(f'Execution error: {e}')
+        # set_status('Execution error', ok=False)
+        return None, ''

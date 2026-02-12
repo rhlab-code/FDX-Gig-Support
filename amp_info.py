@@ -127,7 +127,6 @@ def safe_json_load(s):
         logging.debug("Failed to parse JSON. safe_json_load returning None.")
         return None
 
-
 def find_IpAddr(json_string, search):
     ret = {}
     logging.debug(f"Finding address for key: {search}")
