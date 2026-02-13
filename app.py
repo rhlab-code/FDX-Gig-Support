@@ -4,8 +4,8 @@
 #
 #   Sample node: PADUSTES4A
 #   Sapmle Amp Name UNREG-PADUSTEST4-24:A1:86:1F:F3:AC
-#   Sample MAC 24:a1:86:1f:f3:ac
-#   Sample IP  2001:0558:6031:001C:3408:5385:73EF:FE58
+#   Sample MAC  24:a1:86:1f:f3:ac
+#   Sample IP   2001:0558:6031:001C:3408:5385:73EF:FE58
 
 ''' example usages:
 python app.py --image CC --addr 24:a1:86:1f:f3:ac
@@ -215,9 +215,12 @@ def launch_gui():
 		set_status('Cleared', ok=True)
 
 	def select_all_tasks():
-		"""Select all tasks."""
-		for var in task_vars.values():
-			var.set(True)
+		"""Select all tasks except 'reset'."""
+		for task, var in task_vars.items():
+			if task.lower() != 'reset':
+				var.set(True)
+			else:
+				var.set(False)
 
 
 	# Spinner animation setup
