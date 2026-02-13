@@ -118,7 +118,6 @@ def launch_gui():
 		# 'showModuleInfo', 'show_spectrum', 'show_ds-profile', 'show_us-profile', 
 		# 'show_rf_components', 'show_fafe',
 		'get_wbfft', 'get_eq', 'get_sf', 'get_ec', 'get_us_psd',
-		'get_wbfft_hal_gains',
 		'reset'
 	]
 	

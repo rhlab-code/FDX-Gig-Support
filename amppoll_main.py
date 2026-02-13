@@ -1,34 +1,42 @@
-import argparse
-import sys
-import os
-import json
-import logging
-import importlib
-from datetime import datetime
-import time
-import threading
-import queue
+# amppoll_main.py - Main GUI for Amp Polling Tool
+from tkinter import *
 import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 
-def setup_logging(output_dir):
-    """Sets up file and stream logging to the specified directory."""
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    log_filename = os.path.join(output_dir, f"workflow_log_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log")
-    
-    for handler in logging.root.handlers[:]:
-        logging.root.removeHandler(handler)
-        
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    
-    file_handler = logging.FileHandler(log_filename)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-    
-    stream_handler = logging.StreamHandler(sys.stdout)
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-    
-    return log_filename
+def calculate(*args):
+    try:
+        value = float(feet.get())
+        meters.set(round(0.3048 * value, 4))
+    except ValueError:
+        pass
+
+root = Tk()
+root.title("AmpPoll - A lightweight utility to poll FDX amplifiers for key performance metrics")
+
+mainframe = ttk.Frame(root, padding=(3, 3, 12, 12))
+mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+
+feet = StringVar()
+feet_entry = ttk.Entry(mainframe, width=7, textvariable=feet)
+feet_entry.grid(column=2, row=1, sticky=(W, E))
+
+meters = StringVar()
+ttk.Label(mainframe, textvariable=meters).grid(column=2, row=2, sticky=(W, E))
+
+ttk.Button(mainframe, text="Calculate", command=calculate).grid(column=3, row=3, sticky=W)
+
+ttk.Label(mainframe, text="feet").grid(column=3, row=1, sticky=W)
+ttk.Label(mainframe, text="is equivalent to").grid(column=1, row=2, sticky=E)
+ttk.Label(mainframe, text="meters").grid(column=3, row=2, sticky=W)
+
+root.columnconfigure(0, weight=1)
+root.rowconfigure(0, weight=1)
+mainframe.columnconfigure(2, weight=1)
+for child in mainframe.winfo_children(): 
+    child.grid_configure(padx=5, pady=5)
+
+feet_entry.focus()
+root.bind("<Return>", calculate)
+
+root.mainloop()
