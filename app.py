@@ -136,7 +136,15 @@ def launch_gui():
 	# Function to convert task names to human-readable labels
 	def make_label(task_name):
 		"""Convert task_name like 'show_ds-profile' to 'Show DS Profile'."""
-		label = task_name.replace('_', ' ').replace('-', ' ')
+		label = task_name.replace('_', ' ').replace('-', ' ')\
+			.replace('get', '')\
+			.replace('sf', 'Shape Filter')\
+			.replace('eq', 'Equalizer')\
+			.replace('ec', 'Echo Canceller')\
+			.replace('us', 'Upstream')\
+			.replace('ds', 'Downstream')\
+			.replace('wbfft', 'WBFFT')\
+			.replace('psd', 'Power Spectral Density')
 		return ' '.join(word.capitalize() for word in label.split())
 	
 	# Create frame for checkboxes
