@@ -8,7 +8,7 @@ AmpPoll is an amplifier analysis platform for testing Comcast modem/AMP devices.
 
 Three core workflows:
 1. **amp_info.py** – MAC → IPv6 lookup via Thanos API (subprocess calls to toybox-main/thanos2.py)
-2. **wbfft_v2.py** – Spectrum analysis with dynamic command sequences (replaced wbfft.py)
+2. **tools.py** – Spectrum analysis with dynamic command sequences (replaced wbfft.py)
 3. **analysis.py + ssh_manager.py** – Centralized EC metrics, coefficient decoding, data processing
 
 All device communication uses passwordless jump-box SSH (`jump.autobahn.comcast.com`) with SCP file retrieval.
@@ -21,7 +21,7 @@ All device communication uses passwordless jump-box SSH (`jump.autobahn.comcast.
 - `config_manager.py.bak` / `ec_config_manager.py.bak` – static configs
 
 **New (modular)**:
-- **wbfft_v2.py** – Command dispatch via `commands.py` (generated sequences from `amp_settings.json`)
+- **tools.py** – Command dispatch via `commands.py` (generated sequences from `amp_settings.json`)
 - **ssh_manager.py** – 1912-line unified SSH/SCP executor with task chaining, profile persistence, and reporting
 - **analysis.py** – Shared data processing (coefficient decoding, FFT, PSD, peak detection)
 - **status_monitor.py** – Real-time task dashboard (Tkinter-based for multi-device tracking)
@@ -50,7 +50,7 @@ output/<NODE_ID>/<MAC>/<TIMESTAMP>/{ec/wbfft}/ [JSON/HTML/CSV]
 ```
 
 ### Threading & Async Workflow
-- `wbfft_v2.py` uses `threading.Thread` + `queue.Queue` for non-blocking CLI execution
+- `tools.py` uses `threading.Thread` + `queue.Queue` for non-blocking CLI execution
 - `StatusMonitor` (Tkinter) listens on queue for real-time multi-device dashboard updates
 - `app.py` orchestrates legacy GUI (may be deprecated in favor of StatusMonitor)
 
@@ -60,12 +60,12 @@ output/<NODE_ID>/<MAC>/<TIMESTAMP>/{ec/wbfft}/ [JSON/HTML/CSV]
 ```powershell
 python app.py [--addr <MAC|IPv6>]
 ```
-Tkinter interface for single-device analysis. Orchestrates amp_info.py → wbfft_v2.py → analysis.py pipeline via threading.
+Tkinter interface for single-device analysis. Orchestrates amp_info.py → tools.py → analysis.py pipeline via threading.
 
-### 2. Modern Batch Workflow (wbfft_v2.py + StatusMonitor)
+### 2. Modern Batch Workflow (tools.py + StatusMonitor)
 ```powershell
 # Full workflow with dynamic commands from amp_settings.json
-python wbfft_v2.py --env PROD --task showModuleInfo show_ds-profile show_us-profile get_wbfft get_ec \
+python tools.py --env PROD --task showModuleInfo show_ds-profile show_us-profile get_wbfft get_ec \
   --settings amp_settings.json --mac 24:a1:86:1d:da:90
 
 # Output: ./output/NJMFD00N0A/24a1861dda90/2026-02-12_08-22/ (NODE_ID from metadata)
@@ -178,13 +178,13 @@ When working with output files:
 
 ### Threading & GUI Updates
 - Long-running operations (SSH, SCP) block the thread; always wrap in `threading.Thread(target=func, daemon=True).start()`
-- GUI updates from worker threads → use `root.after()` or thread-safe queues (see `wbfft_v2.py` queue-based StatusMonitor updates)
+- GUI updates from worker threads → use `root.after()` or thread-safe queues (see `tools.py` queue-based StatusMonitor updates)
 - Exception handling: Catch `HardStopException` from `execute_command_on_shell()` for timeout/validation failures
 
 ### Address Resolution Flow
 1. If MAC provided → `amp_info.py` subprocess calls `toybox-main/thanos2.py` (Thanos API)
 2. Thanos returns JSON with IPv6, node_id, device_name
-3. wbfft_v2.py uses IP for SSH; MAC used only for file/log naming
+3. tools.py uses IP for SSH; MAC used only for file/log naming
 4. Bypass IP lookup with `--ip` direct arg (useful for testing known devices)
 
 ## Testing / Validation Checklist
@@ -199,7 +199,7 @@ When working with output files:
 | File | Purpose |
 |------|---------|
 | [app.py](app.py) | Tkinter GUI orchestrator; legacy single-device workflow |
-| [wbfft_v2.py](wbfft_v2.py) | Modern CLI entry point; task dispatch + multi-device support |
+| [tools.py](tools.py) | Modern CLI entry point; task dispatch + multi-device support |
 | [amp_info.py](amp_info.py) | MAC → IP lookup via Thanos API; subprocess wrapper |
 | [ssh_manager.py](ssh_manager.py) | Unified SSH/SCP executor (1912 lines); core state machine, task chaining, profile persistence |
 | [commands.py](commands.py) | Dynamic HAL sequence generator from amp_settings.json |

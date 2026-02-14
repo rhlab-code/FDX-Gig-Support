@@ -1,18 +1,27 @@
 # Required dependencies for the project
 # To install, run: pip install -r requirements.txt
 
-macaddress
-numpy
-paramiko
-pandas
-scipy
-scp
-plotly
-python-dotenv
-requests
+# Core dependencies
+macaddress>=2.0.2
+numpy>=1.24.0
+paramiko>=3.0.0
+pandas>=2.0.0
+scipy>=1.10.0
+scp>=0.14.5
+plotly>=5.14.0
+python-dotenv>=1.0.0
+requests>=2.31.0
 ImageGrab
-Pillow
-#office365-rest-python-client
-matplotlib
-mpld3
-ttkbootstrap
+Pillow>=10.0.0
+matplotlib>=3.7.0
+mpld3>=0.5.9
+ipaddress>=1.0.23
+
+# PyQt6 for modern GUI (replaces ttkbootstrap)
+PyQt6>=6.6.0
+PyQt6-WebEngine>=6.6.0
+
+# Development dependencies (optional)
+# pytest>=7.4.0
+# black>=23.0.0
+# mypy>=1.5.0

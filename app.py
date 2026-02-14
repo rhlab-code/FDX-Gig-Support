@@ -371,7 +371,7 @@ def launch_gui():
 		fn_name_string = '/'.join(fn_components)
 		append_output(f'Constructed path: {fn_name_string}')
 
-		# If we have an IP, call wbfft_v2.py with --mac and --ip
+		# If we have an IP, call tools.py with --mac and --ip
 		if ip_to_use:
 			set_status('Working on it', ok=True)
 			env = os.environ.copy()
@@ -381,9 +381,9 @@ def launch_gui():
 			task_arg = ' '.join(selected_tasks_list)
 
 			# wbfft_2.py
-			# python wbfft_v2.py 24:a1:86:1d:da:90 --ip 2001:558:6026:32:912b:2704:46eb:f4 --task showModuleInfo get_wbfft get_ec
+			# python tools.py 24:a1:86:1d:da:90 --ip 2001:558:6026:32:912b:2704:46eb:f4 --task showModuleInfo get_wbfft get_ec
 			try:
-				wbfft_path = os.path.join(os.path.dirname(__file__), 'wbfft_v2.py')
+				wbfft_path = os.path.join(os.path.dirname(__file__), 'tools.py')
 				# Build a single command string with quoted arguments
 				wbfft_cmd_str = f'"{sys.executable}" "{wbfft_path}" --mac "{mac_for_fn}" --ip "{ip_to_use}" --image "{image}" --output "{fn_name_string}" --task {task_arg}'
 				append_output(f'Running: {wbfft_cmd_str}')
